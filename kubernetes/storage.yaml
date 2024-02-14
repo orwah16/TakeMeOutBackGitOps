@@ -1,0 +1,12 @@
+#using efs as it allows multiple instances to write on it
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: db-storage
+  namespace: staging
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+volumeBindingMode: WaitForFirstConsumer
+provisioner: ebs.csi.aws.com
+parameters:
+  

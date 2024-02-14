@@ -1,0 +1,18 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: takemeout-monitor
+  namespace: staging
+  labels:
+    prometheus: main
+spec:
+  namespaceSelector:
+    matchNames:
+      - staging
+  selector:
+    matchLabels:
+      app: take-me-out-back
+  podMetricsEndpoints:
+    - port: http-metrics
+      path: /metrics
