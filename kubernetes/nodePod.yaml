@@ -50,9 +50,6 @@ spec:
       containers:
         - name: app
           image: orwah/takemeout:latest
-          # command: [ "/bin/bash", "-c", "--" ]
-          # args: [ "while true; do sleep 30; done;" ]
-          #commands: ["node", "app.js"]
           # volumeMounts:
           #   - name: node-persistent-storage
           #     mountPath: /data/db
