@@ -49,7 +49,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: orwah/takemeout:c4d539c8b3222f11deb976e292053e1baa9da396
+          image: orwah/takemeout:cc9da18fe3b850859a35b52a9a04a2e001b79268
           # volumeMounts:
           #   - name: node-persistent-storage
           #     mountPath: /data/db
