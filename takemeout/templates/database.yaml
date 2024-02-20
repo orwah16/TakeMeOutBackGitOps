@@ -1,0 +1,206 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: database
+  namespace: staging
+spec:
+  selector:
+    app.kubernetes.io/name: database
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+
+# ---
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: postgres-config
+#   namespace: staging
+#   labels:
+#     app: database
+# data:
+#   POSTGRES_USER: postgres
+#   POSTGRES_DB: takemeoutdb
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pg-initdb-config
+  namespace: staging
+data:
+  init.sql: |
+    
+    CREATE DATABASE takemeoutdb;
+
+    DROP TABLE IF EXISTS users;
+    DROP TABLE IF EXISTS posts;
+    DROP TABLE IF EXISTS comments;
+    DROP TABLE IF EXISTS friends;
+    DROP TABLE IF EXISTS tags;
+    DROP TABLE IF EXISTS interests;
+    DROP TABLE IF EXISTS user_interests;
+    DROP TABLE IF EXISTS post_interests;
+
+    CREATE TABLE users(
+      user_id INT GENERATED ALWAYS AS IDENTITY,
+      first_name VARCHAR(255) NOT NULL,
+      last_name VARCHAR(255),
+      email VARCHAR(255) NOT NULL,
+      phone_number VARCHAR(255),
+      city VARCHAR(255),
+      image VARCHAR(255),
+      user_posts INT[],
+      PRIMARY KEY (user_id)
+    );
+
+    CREATE TABLE posts(
+      post_id INT GENERATED ALWAYS AS IDENTITY,
+      user_id INT,
+      post_title VARCHAR(255),
+      post_interest VARCHAR(255),
+      post_location VARCHAR(255),
+      image VARCHAR(255),
+      text TEXT,
+      PRIMARY KEY(post_id),
+      CONSTRAINT fk_user
+        FOREIGN KEY(user_id)
+          REFERENCES users(user_id)
+            ON DELETE CASCADE
+    );
+
+    CREATE TABLE comments(
+      comment_id INT GENERATED ALWAYS AS IDENTITY,
+      commenter_id INT REFERENCES users (user_id),
+      post_id INT,
+      text TEXT,
+      CONSTRAINT fk_post
+        FOREIGN KEY (post_id)
+          REFERENCES posts(post_id)
+            ON DELETE CASCADE
+    );
+
+    CREATE TABLE interests(
+      interest_id INT GENERATED ALWAYS AS IDENTITY,
+      interest_name VARCHAR(255),
+      rating integer,
+      PRIMARY KEY (interest_id)
+    );
+
+    CREATE TABLE friends(
+      user1 INT NOT NULL REFERENCES users (user_id) ON DELETE CASCADE,
+      user2 INT NOT NULL REFERENCES users (user_id) ON DELETE CASCADE,
+      rating integer
+    );
+
+    /*posts user tagged in and vice versa (interested in)*/
+    CREATE TABLE tags(   
+      user_id INT NOT NULL REFERENCES users (user_id) ON DELETE CASCADE,
+      post_id INT NOT NULL REFERENCES posts (post_id) ON DELETE CASCADE
+    );
+
+    /*users interests*/
+    CREATE TABLE user_interests(   
+      user_id INT NOT NULL REFERENCES users (user_id) ON DELETE CASCADE,
+      interest_id INT NOT NULL REFERENCES interests (interest_id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE post_interests(   
+      user_id INT NOT NULL REFERENCES posts (post_id) ON DELETE CASCADE,
+      post_id INT NOT NULL REFERENCES interests (interest_id) ON DELETE CASCADE
+    );
+    GRANT ALL PRIVILEGES ON DATABASE takemeoutdb TO postgres;
+    SET search_path TO takemeoutdb, public;
+    SHOW search_path;
+---
+
+apiVersion: v1
+data:
+  password: MTIzNDU2
+kind: Secret
+metadata:
+  name: postgres-secret
+  namespace: staging
+type: Opaque
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database
+  namespace: staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: database
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: database
+        app: database
+    spec:
+      containers:
+        - name: database
+          image: postgres:14
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/bash", "-c", "sleep 20 && psql -U postgres -d takemeoutdb -f docker-entrypoint-initdb.d/init.sql"]
+          volumeMounts:
+            # - name: database-persistent-storage
+            #   mountPath: /var/lib/postgresql/data
+            - name: test-volume
+              mountPath: /etc/pg-config
+            - name: pg-initdb
+              mountPath: /docker-entrypoint-initdb.d
+            # - name: postgres-config
+            #   mountPath: /etc/postgresql
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+            # - name: POSTGRES_DB
+            #   value: takemeoutdb
+
+          imagePullPolicy: Always 
+      volumes:
+        # - name: database-persistent-storage
+        #   persistentVolumeClaim:
+        #     claimName: ebs-claim
+        - name: test-volume
+          emptyDir:
+            sizeLimit: 500Mi
+        - name: pg-initdb
+          configMap:
+            name: pg-initdb-config
+
+        # - name: postgres-config 
+        #   configMap:
+        #     name: postgres-config
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ebs-claim
+  namespace: staging
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: db-storage
+  resources:
+    requests:
+      storage: 5Gi

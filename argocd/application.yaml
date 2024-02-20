@@ -9,9 +9,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/orwah16/TakeMeOutBackGitOps/kubernetes.git
+    repoURL: https://github.com/orwah16/TakeMeOutBackGitOps.git
     targetRevision: HEAD
-    path: takemeout
+    path: ./kubernetes
   destination:
     server: https://kubernetes.default.svc
   syncPolicy:
