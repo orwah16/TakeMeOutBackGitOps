@@ -26,6 +26,7 @@ spec:
 #   PGDATABASE: "takemeoutdb"
 #   PGHOST: "db"
 #   PGPASSWORD: "123456"
+#   PGUSER: postgres
 ---
 apiVersion: apps/v1
 kind: Deployment
