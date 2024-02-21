@@ -2,22 +2,22 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: database
-  namespace: staging
+  name: {{ .Values.dataBaseName }}
+  namespace: {{ .Values.nameSpace }}
 spec:
   selector:
-    app.kubernetes.io/name: database
+    app.kubernetes.io/name: {{ .Values.dataBaseName }}
   ports:
     - protocol: TCP
-      port: 5432
-      targetPort: 5432
+      port: {{ .Values.database.port }}
+      targetPort: {{ .Values.database.port }}
 
 # ---
 # apiVersion: v1
 # kind: ConfigMap
 # metadata:
 #   name: postgres-config
-#   namespace: staging
+#   namespace: {{ .Values.nameSpace }}
 #   labels:
 #     app: database
 # data:
@@ -29,7 +29,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: pg-initdb-config
-  namespace: staging
+  namespace: {{ .Values.nameSpace }}
 data:
   init.sql: |
     
@@ -122,20 +122,20 @@ data:
 kind: Secret
 metadata:
   name: postgres-secret
-  namespace: staging
+  namespace: {{ .Values.nameSpace }}
 type: Opaque
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: database
-  namespace: staging
+  name:  {{ .Values.dataBaseName }}
+  namespace: {{ .Values.nameSpace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: database
+      app:  {{ .Values.database.name }}
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -144,12 +144,12 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: database
-        app: database
+        app.kubernetes.io/name:  {{ .Values.database.name }}
+        app:  {{ .Values.database.name }}
     spec:
       containers:
-        - name: database
-          image: postgres:14
+        - name:  {{ .Values.database.name }}
+          image: {{ .Values.database.image }}
           lifecycle:
             postStart:
               exec:
@@ -164,7 +164,7 @@ spec:
             # - name: postgres-config
             #   mountPath: /etc/postgresql
           ports:
-            - containerPort: 5432
+            - containerPort: {{ .Values.database.port }}
           env:
             - name: POSTGRES_USER
               value: postgres
@@ -196,7 +196,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: ebs-claim
-  namespace: staging
+  namespace: {{ .Values.nameSpace }}
 spec:
   accessModes:
     - ReadWriteOnce
