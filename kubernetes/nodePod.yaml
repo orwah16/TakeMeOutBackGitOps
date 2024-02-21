@@ -2,24 +2,24 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: take-me-out-back
-  namespace: staging
+  name: {{ .Values.app.name }}
+  namespace: {{ .Values.nameSpace }}
   labels:
     app: take-me-out-back-service
 spec:
   selector:
-    app: take-me-out-back
+    app: {{ .Values.app.name }}
   ports:
     - name: http
-      port: 3000
-      targetPort: 3000
+      port: {{ .Values.app.service_port }}
+      targetPort: {{ .Values.app.service_target_port }}
   type: LoadBalancer
 # ---
 # apiVersion: v1
 # kind: ConfigMap
 # metadata:
 #   name: take-me-out-back-config
-#   namespace: staging
+#   namespace: {{ .Values.nameSpace }}
 #   labels:
 #     app: take-me-out-back
 # data:
@@ -30,13 +30,13 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: take-me-out-back
-  namespace: staging
+  name: {{ .Values.app.name }}
+  namespace: {{ .Values.nameSpace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: take-me-out-back
+      app: {{ .Values.app.name }}
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -45,19 +45,19 @@ spec:
   template:
     metadata:
       labels:
-        app: take-me-out-back
+        app: {{ .Values.app.name }}
     spec:
       containers:
         - name: app
-          image: orwah/takemeout:441af0d6858537d066db7e0296326f9387da3639
+          image: orwah/takemeout:dfbc5f3ab3885cdbf7d0a42ad20619b2a4b83e09
           # volumeMounts:
           #   - name: node-persistent-storage
           #     mountPath: /data/db
           ports:
             - name: http
-              containerPort:  3000
+              containerPort:  {{ .Values.app.pod_http_port }}
             - name: http-metrics
-              containerPort:  3001
+              containerPort:  {{ .Values.app.pod_metrics_port }}
           resources:
             requests:
               memory: 256Mi
