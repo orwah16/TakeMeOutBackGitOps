@@ -192,15 +192,15 @@ spec:
         #   configMap:
         #     name: postgres-config
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: ebs-claim
-  namespace: {{ .Values.nameSpace }}
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: db-storage
-  resources:
-    requests:
-      storage: 5Gi
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: ebs-claim
+#   namespace: {{ .Values.nameSpace }}
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   storageClassName: db-storage
+#   resources:
+#     requests:
+#       storage: 5Gi
