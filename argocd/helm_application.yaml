@@ -14,14 +14,10 @@ spec:
     repoURL: https://github.com/orwah16/TakeMeOutBackGitOps.git
     targetRevision: main
     path: takemeout-chart
-    # helm:
-    #   parameters:
-    #     - name: "replicaCount"
-    #       value: "2"
-    #     - name: "image.repository"
-    #       value: aputra/nginx-lesson159
-    #     - name: "image.tag"
-    #       value: v0.1.0
+    ref: values
+    helm:
+      valueFiles:
+      - $values/takemeout-chart/values-stage.yaml 
   destination:
     server: https://kubernetes.default.svc
     namespace: staging
