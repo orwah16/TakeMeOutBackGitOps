@@ -14,10 +14,9 @@ spec:
     repoURL: https://github.com/orwah16/TakeMeOutBackGitOps.git
     targetRevision: main
     path: takemeout-chart
-    ref: values
     helm:
       valueFiles:
-      - $values/takemeout-chart/values-stage.yaml 
+      - /values-stage.yaml 
   destination:
     server: https://kubernetes.default.svc
     namespace: staging
