@@ -150,6 +150,13 @@ spec:
       containers:
         - name:  {{ .Values.database.name }}
           image: {{ .Values.database.image }}
+          resources:
+            requests:
+              memory: 100Mi
+              cpu: 200m
+            limits:
+              memory: 256Mi
+              cpu: 200m
           lifecycle:
             postStart:
               exec:
