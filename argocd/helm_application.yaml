@@ -16,7 +16,7 @@ spec:
     path: takemeout-chart
     helm:
       valueFiles:
-      - /values-stage.yaml 
+      - ./takemeout_chart/values-stage.yaml 
   destination:
     server: https://kubernetes.default.svc
     namespace: staging
