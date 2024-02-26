@@ -43,7 +43,6 @@ spec:
 #   PGDATABASE: "takemeoutdb"
 #   PGHOST: "db"
 #   PGPASSWORD: "123456"
-#   PGUSER: postgres
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -67,7 +66,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: orwah/takemeout:9dbe8c19fc8b5960892add03d188234f6ac33c1c
+          image: orwah/takemeout:6f6ab15ca2ed9399904c6a7bee472a09785ffd0e
           # volumeMounts:
           #   - name: node-persistent-storage
           #     mountPath: /data/db
