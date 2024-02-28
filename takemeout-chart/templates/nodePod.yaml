@@ -14,6 +14,23 @@ spec:
       port: {{ .Values.app.service_port }}
       targetPort: {{ .Values.app.service_target_port }}
   type: LoadBalancer
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-prom
+  namespace: {{ .Values.nameSpace }}
+  labels:
+    app: take-me-out-back-prom-service
+spec:
+  selector:
+    app: {{ .Values.app.name }}
+  ports:
+    - name: http-metrics
+      port: {{ .Values.app.pod_metrics_port }}
+      targetPort: http-metrics
+  type: ClusterIP
 # ---
 # apiVersion: v1
 # kind: ConfigMap
@@ -49,7 +66,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: orwah/takemeout:8d89e23d94895f3cc6a5e89ee4fdf68561820cb1
+          image: orwah/takemeout:6f6ab15ca2ed9399904c6a7bee472a09785ffd0e
           # volumeMounts:
           #   - name: node-persistent-storage
           #     mountPath: /data/db
