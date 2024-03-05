@@ -14,5 +14,5 @@ spec:
     matchLabels:
       app: {{ .Values.app.name }}
   podMetricsEndpoints:
-    - port: http-metrics
+    - port: http
       path: /metrics
