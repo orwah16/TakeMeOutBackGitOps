@@ -9,7 +9,7 @@ the CI pipeline on TakeMeOutBack repository with every merge from the feature br
 Traffic gets to the cluster using loadbalancer <br/>
 Number of hosts is managed using auto-scaler <br/>
 for networking the project utilizes CNI plugin and for storage management CSI plugin <br/>
-### Monitoring: <br/>
+### Monitoring: 
 for metric scraping prometheus was used with grafana for building dashboards (grafana was deployed using helm terraform provider charts) <br/>
 ![alt text](./Images/terraform.png?raw=true)
 ![alt text](./Images/argocd.png?raw=true)
