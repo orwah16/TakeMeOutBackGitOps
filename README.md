@@ -1,4 +1,4 @@
-# GITOPS repository for the TakeMeOutBack project 
+# GITOPS repository for the TakeMeOutBack project (https://github.com/orwah16/TakeMeOutBack)
 ## The project was deployed to an EKS cluster on two private subenets with another 2 public subnets for bastions and Nat
 ## The infrastructure was provisioned using terraform and deployed using Argocd and Helm, the deployment is triggered using 
 ## the CI pipeline on TakeMeOutBack repository with every merge from the feature branch
